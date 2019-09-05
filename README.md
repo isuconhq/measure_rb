@@ -3,7 +3,16 @@
 ## Install
 
 1. `cp -r ./tools/measure.rb path/to/tools/measure.rb`
-2. Insert measure code
+2. Add redis gem
+
+```diff
+group :development do
++ gem "redis"
+end
+```
+
+3. `INPUT_FILE=path/to/web.rb ruby ./tools/debug_code.rb`
+4. Insert measure code
 
 ```diff
 class Web < sinatra::Base
