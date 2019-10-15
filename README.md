@@ -2,8 +2,14 @@
 
 ## Install
 
-1. `cp -r ./tools/measure.rb path/to/tools/measure.rb`
-2. Add redis gem
+### 1. Get measure
+
+```
+$ git clone measure_rb
+$ cp -r ./measure_rb/tools path/to/sinatra_app
+```
+
+### 2. Add redis gem
 
 ```diff
 group :development do
@@ -11,10 +17,15 @@ group :development do
 end
 ```
 
-3. `INPUT_FILE=path/to/web.rb ruby ./tools/debug_code.rb`
-4. Insert measure code
+### 3. Setup measure for sinatra app
+
+```
+$ code web.rb
+```
 
 ```diff
++ require 'redis'
+
 class Web < sinatra::Base
   configure do
     ...
@@ -29,11 +40,9 @@ class Web < sinatra::Base
 +     Redis.current.rpush(key, Time.now - start_time)
 +   end
 
-    def helper_method
-+     measure(key: "helper_method") do
-      ...
-+     end
-    end
+  get "/initialize" do
++   Redis.current.flushall
+    ...
   end
 
 + get "/measure.csv" do
@@ -43,16 +52,27 @@ class Web < sinatra::Base
 +   })
 +   Measure.call
 + end
+```
 
-  get "/initialize" do
-+   Redis.current.flushall
-    ...
-  end
+### 4.  Insert measure code automatically
 
+```
+$ INPUT_FILE=path/to/web.rb ./tools/debug_code.rb
+```
+
+you can see the result like this.
+
+
+```diff
   get "/" do
 +   measure(key: "GET /") do
-    ...
++    ...
 +   end
   end
-end
 ```
+
+### 5. Download csv data
+
+After you launced sinatra app,
+
+you can access `sinatra_root_path/measure.csv` in your web browser.
